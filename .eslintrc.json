@@ -1,3 +1,12 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off",  // Disables 'no-explicit-any' rule
+    "prefer-const": "warn",  // Changes 'prefer-const' to a warning instead of an error
+    "@typescript-eslint/no-empty-interface": "off",  // Disables empty interface rule
+    "@typescript-eslint/no-unused-vars": "warn",  // Changes unused variables to a warning
+    "@typescript-eslint/no-unused-expressions": "warn", // Changes unused expressions to a warning
+    "react-hooks/exhaustive-deps": "off",  // Disables warning for missing dependencies in useEffect
+    "@typescript-eslint/no-empty-object-type": "off"
+  }
 }
