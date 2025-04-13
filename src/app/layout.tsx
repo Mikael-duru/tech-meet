@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 
 import "./globals.css";
 import ConvexClerkProvider from "@/components/providers/convex-clerk-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { Toaster } from "sonner";
 
-const geistSans = localFont({
-	src: "./fonts/GeistVF.woff",
-	variable: "--font-geist-sans",
-	weight: "100 900",
-});
-const geistMono = localFont({
-	src: "./fonts/GeistMonoVF.woff",
-	variable: "--font-geist-mono",
-	weight: "100 900",
+const inter = Inter({
+	subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -27,14 +22,19 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<ConvexClerkProvider>
-			<html lang="en">
-				<body
-					className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+		<html lang="en" suppressHydrationWarning>
+			<body className={inter.className}>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="dark"
+					enableSystem
+					disableTransitionOnChange
 				>
-					{children}
-				</body>
-			</html>
-		</ConvexClerkProvider>
+					<ConvexClerkProvider>
+						{children} <Toaster richColors />
+					</ConvexClerkProvider>
+				</ThemeProvider>
+			</body>
+		</html>
 	);
 }
