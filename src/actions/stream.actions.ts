@@ -12,7 +12,7 @@ export const streamTokenProvider = async () => {
 		process.env.STREAM_SECRET_KEY!
 	);
 
-	const token = streamClient.generateUserToken({ user_id: user.id }); // validity is optional
+	const token = streamClient.generateUserToken({ user_id: user.id }); // validity is optional. By default, it expires in 1 hour.
 
 	return token;
 };

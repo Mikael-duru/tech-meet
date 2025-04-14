@@ -31,11 +31,6 @@ const StreamVideoProvider = ({ children }: { children: React.ReactNode }) => {
 	}, [user, isLoaded]);
 
 	if (!streamVideoClient) return <LoaderUI />;
-	// <div className="flex justify-center items-center h-screen w-full bg-background">
-	//         <div className="h-20 w-full animate-bounce flex justify-center items-center">
-	//           <Logo />
-	//         </div>
-	//       </div>
 
 	return <StreamVideo client={streamVideoClient}>{children}</StreamVideo>;
 };

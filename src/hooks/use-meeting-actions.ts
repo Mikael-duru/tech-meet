@@ -13,7 +13,7 @@ const useMeetingActions = () => {
 			const id = crypto.randomUUID();
 			const call = client.call("default", id);
 
-			await call.getOrCreate({
+			const meeting = await call.getOrCreate({
 				data: {
 					starts_at: new Date().toISOString(),
 					custom: {
