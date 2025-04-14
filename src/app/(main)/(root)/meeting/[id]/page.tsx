@@ -17,7 +17,7 @@ const MeetingPage = () => {
 	const { call, isCallLoading } = useGetCallById(id);
 	const [isSetupComplete, setIsSetupComplete] = useState(false);
 
-	// Check if setup is complete and
+	// Set isSetupComplete to true if cookie exists and clean up on unmount
 	useEffect(() => {
 		// On mount: check if cookie exists
 		const inSession = Cookies.get("callInSession") === "true";
@@ -31,7 +31,7 @@ const MeetingPage = () => {
 		};
 	}, []);
 
-	// Store setup complete status in cookie if true
+	// Store call-in-session in cookie if isSetupComplete is true
 	useEffect(() => {
 		if (isSetupComplete) {
 			Cookies.set("callInSession", "true");
