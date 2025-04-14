@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "sonner";
 
 import {
 	Dialog,
@@ -10,7 +11,6 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import useMeetingActions from "@/hooks/use-meeting-actions";
-import { toast } from "sonner";
 
 type MeetingModalProps = {
 	isOpen: boolean;
