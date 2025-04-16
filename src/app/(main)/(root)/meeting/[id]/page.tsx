@@ -2,41 +2,92 @@
 
 import { useUser } from "@clerk/nextjs";
 import { StreamCall, StreamTheme } from "@stream-io/video-react-sdk";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import Cookies from "js-cookie";
+import { toast } from "sonner";
+import { VideoOffIcon } from "lucide-react";
 
 import LoaderUI from "@/components/loader-ui";
 import MeetingSetup from "@/components/meeting-setup";
 import MeetingRoom from "@/components/meeting-room";
 import useGetCallById from "@/hooks/use-get-call-by-id";
+import { Button } from "@/components/ui/button";
 
 const MeetingPage = () => {
 	const { id } = useParams();
+	const router = useRouter();
+
 	const { isLoaded } = useUser();
 	const { call, isCallLoading } = useGetCallById(id);
 	const [isSetupComplete, setIsSetupComplete] = useState(false);
 
-	// Set isSetupComplete to true if cookie exists and clean up on unmount
+	// Rejoin call on reload/refresh in a tab
 	useEffect(() => {
-		// On mount: check if cookie exists
-		const inSession = Cookies.get("callInSession") === "true";
-		if (inSession) {
-			setIsSetupComplete(inSession);
-		}
+		if (!call || !id) return;
 
-		return () => {
-			// On unmount: remove cookie
-			Cookies.remove("callInSession");
+		const session = sessionStorage.getItem("__callInSession");
+		if (!session) return;
+
+		try {
+			const { callSession, setupCompleted } = JSON.parse(session);
+			if (callSession !== id || !setupCompleted) return;
+
+			const rejoinCall = async () => {
+				toast.loading("Rejoining call...", { id: "rejoining" });
+
+				try {
+					call.camera.disable();
+					setIsSetupComplete(true);
+					await call.join();
+					localStorage.setItem("__techMeetCallSession", id as string);
+					toast.success("Rejoined meeting 🎉", { id: "rejoining" });
+				} catch (err) {
+					console.error("Call rejoin failed:", err);
+					sessionStorage.removeItem("__callInSession");
+					localStorage.removeItem("__techMeetCallSession");
+					toast.error("This meeting has ended.", { id: "rejoining" });
+				}
+			};
+
+			rejoinCall();
+		} catch (err) {
+			console.warn("Invalid session data:", err);
+			sessionStorage.removeItem("__callInSession");
+			if (localStorage.getItem("__techMeetCallSession") === id) {
+				localStorage.removeItem("__techMeetCallSession");
+			}
+		}
+	}, [call, id]);
+
+	// Store in sessionStorage when setup is complete
+	useEffect(() => {
+		if (isSetupComplete && id) {
+			sessionStorage.setItem(
+				"__callInSession",
+				JSON.stringify({
+					callSession: id,
+					setupCompleted: true,
+				})
+			);
+			localStorage.setItem("__techMeetCallSession", id as string);
+		}
+	}, [isSetupComplete, id]);
+
+	// Add window beforeunload event to clean up localStorage properly.
+	useEffect(() => {
+		const handleTabClose = () => {
+			// Only clear if this tab is the only one holding the session
+			const callSessionId = localStorage.getItem("__techMeetCallSession");
+			if (callSessionId === id) {
+				localStorage.removeItem("__techMeetCallSession");
+			}
 		};
-	}, []);
 
-	// Store call-in-session in cookie if isSetupComplete is true
-	useEffect(() => {
-		if (isSetupComplete) {
-			Cookies.set("callInSession", "true");
-		}
-	}, [isSetupComplete]);
+		window.addEventListener("beforeunload", handleTabClose);
+		return () => {
+			window.removeEventListener("beforeunload", handleTabClose);
+		};
+	}, [id]);
 
 	if (!isLoaded || isCallLoading) return <LoaderUI />;
 
@@ -50,11 +101,32 @@ const MeetingPage = () => {
 		);
 	}
 
+	if (call.state.endedAt) {
+		return (
+			<div className="h-[calc(100vh-4rem-1px)] w-full flex flex-col items-center justify-center text-center p-6">
+				<VideoOffIcon className="stroke stroke-[1.5] stroke-red-500 mb-4 size-12 md:size-16" />
+				<h1 className="text-2xl font-bold mb-2">The meeting has ended</h1>
+				<p className="text-muted-foreground mb-6">
+					The host has ended this call for everyone.
+				</p>
+				<Button
+					className="gap-2 font-medium bg-emerald-600 dark:bg-emerald-800 dark:border-emerald-400 text-emerald-50 hover:bg-emerald-700 hover:text-emerald-50"
+					onClick={() => router.push("/")}
+				>
+					Return to Home
+				</Button>
+			</div>
+		);
+	}
+
 	return (
 		<StreamCall call={call}>
 			<StreamTheme>
 				{!isSetupComplete ? (
-					<MeetingSetup onSetupComplete={() => setIsSetupComplete(true)} />
+					<MeetingSetup
+						onSetupComplete={() => setIsSetupComplete(true)}
+						id={id}
+					/>
 				) : (
 					<MeetingRoom />
 				)}

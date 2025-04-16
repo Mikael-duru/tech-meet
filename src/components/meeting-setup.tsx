@@ -10,31 +10,59 @@ import { toast } from "sonner";
 import { Card } from "./ui/card";
 import { Switch } from "./ui/switch";
 import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
 
 type MeetingSetupProps = {
 	onSetupComplete: () => void;
+	id: string | string[];
 };
 
-const MeetingSetup = ({ onSetupComplete }: MeetingSetupProps) => {
+const MeetingSetup = ({ onSetupComplete, id }: MeetingSetupProps) => {
 	const [isCameraDisabled, setIsCameraDisabled] = useState(true);
 	const [isMicDisabled, setIsMicDisabled] = useState(false);
+	const [activeCallTab, setActiveCallTab] = useState("");
+	const router = useRouter();
 
 	const call = useCall(); // useCall() provides the call prop passed to StreamCall
 
-	if (!call) return null;
+	useEffect(() => {
+		if (isCameraDisabled) call?.camera.disable();
+		else call?.camera.enable();
+	}, [isCameraDisabled, call?.camera]);
 
 	useEffect(() => {
-		if (isCameraDisabled) call.camera.disable();
-		else call.camera.enable();
-	}, [isCameraDisabled, call.camera]);
+		if (isMicDisabled) call?.microphone.disable();
+		else call?.microphone.enable();
+	}, [isMicDisabled, call?.microphone]);
 
 	useEffect(() => {
-		if (isMicDisabled) call.microphone.disable();
-		else call.microphone.enable();
-	}, [isMicDisabled, call.microphone]);
+		const activeCallTab = localStorage.getItem("__techMeetCallSession");
+		if (!activeCallTab) return;
+
+		setActiveCallTab(activeCallTab);
+	}, [id, router]);
 
 	const handleJoinMeeting = async () => {
-		await call.join();
+		if (activeCallTab) {
+			// If user is already in any meeting (same or different)
+			if (activeCallTab === id) {
+				toast.error(
+					"You're already in this meeting in another tab. Please switch to that tab.",
+					{
+						id: "joining-meeting",
+					}
+				);
+			} else {
+				toast.error(
+					"You're currently in a different meeting. Please end that call first.",
+					{
+						id: "joining-meeting",
+					}
+				);
+			}
+			return;
+		}
+		await call?.join();
 		toast.success("Joined meeting successfully! 🎉", {
 			id: "joining-meeting",
 		});
@@ -42,7 +70,7 @@ const MeetingSetup = ({ onSetupComplete }: MeetingSetupProps) => {
 	};
 
 	return (
-		<div className="min-h-[calc(100vh-4rem-1px)] flex items-center justify-center p-6 bg-background/95">
+		<div className="min-h-[calc(100vh-4rem-1px)] flex items-center justify-center py-6 bg-background/95">
 			<div className="w-full max-w-[1200px] mx-auto">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 					{/* video preview container */}
@@ -69,7 +97,7 @@ const MeetingSetup = ({ onSetupComplete }: MeetingSetupProps) => {
 							<div>
 								<h2 className="text-xl font-semibold mb-1">Meeting Details</h2>
 								<p className="text-sm text-muted-foreground break-all">
-									{call.id}
+									{call?.id}
 								</p>
 							</div>
 

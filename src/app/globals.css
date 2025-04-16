@@ -81,3 +81,7 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+.str-video__call-controls {
+	flex-wrap: wrap !important;
+}
