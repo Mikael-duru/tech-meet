@@ -20,6 +20,7 @@ const MeetingPage = () => {
 	const { isLoaded } = useUser();
 	const { call, isCallLoading } = useGetCallById(id);
 	const [isSetupComplete, setIsSetupComplete] = useState(false);
+	const [isRejoining, setIsRejoining] = useState(false);
 
 	// Rejoin call on reload/refresh in a tab
 	useEffect(() => {
@@ -34,18 +35,19 @@ const MeetingPage = () => {
 
 			const rejoinCall = async () => {
 				toast.loading("Rejoining call...", { id: "rejoining" });
+				setIsRejoining(true);
 
 				try {
 					call.camera.disable();
-					setIsSetupComplete(true);
 					await call.join();
-					localStorage.setItem("__techMeetCallSession", id as string);
-					toast.success("Rejoined meeting 🎉", { id: "rejoining" });
+					setIsSetupComplete(true);
+					toast.dismiss("rejoining");
 				} catch (err) {
 					console.error("Call rejoin failed:", err);
-					sessionStorage.removeItem("__callInSession");
-					localStorage.removeItem("__techMeetCallSession");
-					toast.error("This meeting has ended.", { id: "rejoining" });
+					toast.error("Failed to rejoin call", { id: "rejoining" });
+					setIsSetupComplete(false);
+				} finally {
+					setIsRejoining(false);
 				}
 			};
 
@@ -126,6 +128,7 @@ const MeetingPage = () => {
 					<MeetingSetup
 						onSetupComplete={() => setIsSetupComplete(true)}
 						id={id}
+						isRejoining={isRejoining}
 					/>
 				) : (
 					<MeetingRoom />

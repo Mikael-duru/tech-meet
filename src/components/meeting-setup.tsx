@@ -15,12 +15,19 @@ import { useRouter } from "next/navigation";
 type MeetingSetupProps = {
 	onSetupComplete: () => void;
 	id: string | string[];
+	isRejoining: boolean;
 };
 
-const MeetingSetup = ({ onSetupComplete, id }: MeetingSetupProps) => {
+const MeetingSetup = ({
+	onSetupComplete,
+	id,
+	isRejoining,
+}: MeetingSetupProps) => {
 	const [isCameraDisabled, setIsCameraDisabled] = useState(true);
 	const [isMicDisabled, setIsMicDisabled] = useState(false);
 	const [activeCallTab, setActiveCallTab] = useState("");
+	const [isJoining, setIsJoining] = useState(false);
+
 	const router = useRouter();
 
 	const call = useCall(); // useCall() provides the call prop passed to StreamCall
@@ -43,6 +50,7 @@ const MeetingSetup = ({ onSetupComplete, id }: MeetingSetupProps) => {
 	}, [id, router]);
 
 	const handleJoinMeeting = async () => {
+		setIsJoining(true);
 		if (activeCallTab) {
 			// If user is already in any meeting (same or different)
 			if (activeCallTab === id) {
@@ -118,6 +126,7 @@ const MeetingSetup = ({ onSetupComplete, id }: MeetingSetupProps) => {
 										</div>
 										<Switch
 											checked={!isCameraDisabled}
+											disabled={isRejoining || isJoining}
 											onCheckedChange={(checked) =>
 												setIsCameraDisabled(!checked)
 											}
@@ -139,6 +148,7 @@ const MeetingSetup = ({ onSetupComplete, id }: MeetingSetupProps) => {
 										</div>
 										<Switch
 											checked={!isMicDisabled}
+											disabled={isRejoining || isJoining}
 											onCheckedChange={(checked) => setIsMicDisabled(!checked)}
 										/>
 									</div>
@@ -172,6 +182,7 @@ const MeetingSetup = ({ onSetupComplete, id }: MeetingSetupProps) => {
 
 											handleJoinMeeting();
 										}}
+										disabled={isRejoining || isJoining}
 									>
 										Proceed to Meeting
 									</Button>

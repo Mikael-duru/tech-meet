@@ -1,7 +1,8 @@
+import Recordings from "@/components/meetings-records";
 import React from "react";
 
 const RecordingsPage = () => {
-	return <div>RecordingsPage</div>;
+	return <Recordings />;
 };
 
 export default RecordingsPage;

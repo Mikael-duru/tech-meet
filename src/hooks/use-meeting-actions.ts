@@ -48,9 +48,12 @@ const useMeetingActions = () => {
 			}
 		} catch (error) {
 			console.error("Invalid meeting ID or call not found", error);
-			toast.error("Meeting not found. Please check the link or ID.", {
-				id: "join-meeting",
-			});
+			toast.error(
+				"Invalid meeting ID or call not found. Please check the link or ID.",
+				{
+					id: "join-meeting",
+				}
+			);
 		}
 	};
 

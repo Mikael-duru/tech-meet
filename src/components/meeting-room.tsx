@@ -24,6 +24,8 @@ import {
 import { Button } from "./ui/button";
 import EndCallButton from "./end-call-button";
 import CodeEditor from "./code-editor";
+import CopyLinkBtn from "./copy-link-btn";
+import { Card, CardContent } from "./ui/card";
 
 const MeetingRoom = () => {
 	const router = useRouter();
@@ -32,6 +34,25 @@ const MeetingRoom = () => {
 	const { useCallCallingState } = useCallStateHooks();
 
 	const callingState = useCallCallingState();
+
+	if (callingState === CallingState.LEFT) {
+		return (
+			<div className="h-[calc(100vh-4rem-1px)] flex flex-col items-center justify-center gap-2 text-center">
+				<Card>
+					<CardContent className="space-y-4 py-6">
+						<span className="text-3xl">👋</span>
+						<h2 className="text-2xl font-semibold">
+							You&apos;ve left the call
+						</h2>
+						<p className="text-muted-foreground">Have a nice day ☀️</p>
+						<p className="text-muted-foreground text-xs">
+							Redirecting back to home...
+						</p>
+					</CardContent>
+				</Card>
+			</div>
+		);
+	}
 
 	if (callingState !== CallingState.JOINED) {
 		return (
@@ -82,6 +103,8 @@ const MeetingRoom = () => {
 							</div>
 
 							<div className="flex items-center gap-2">
+								<CopyLinkBtn url={window.location.href} type="Meeting" />
+
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
 										<Button variant="outline" size="icon" className="size-10">
