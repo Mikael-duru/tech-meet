@@ -20,6 +20,37 @@ export const createInterview = mutation({
 	},
 });
 
+// Update interview
+export const updateInterview = mutation({
+	args: {
+		id: v.id("interviews"),
+		title: v.string(),
+		description: v.optional(v.string()),
+		startTime: v.number(),
+		candidateId: v.string(),
+		interviewerIds: v.array(v.string()),
+	},
+	handler: async (ctx, args) => {
+		return await ctx.db.patch(args.id, {
+			title: args.title,
+			description: args.description,
+			startTime: args.startTime,
+			candidateId: args.candidateId,
+			interviewerIds: args.interviewerIds,
+		});
+	},
+});
+
+// Delete interview
+export const deleteInterview = mutation({
+	args: {
+		id: v.id("interviews"),
+	},
+	handler: async (ctx, args) => {
+		return await ctx.db.delete(args.id);
+	},
+});
+
 // Update interview status
 export const updateInterviewStatus = mutation({
 	args: {

@@ -14,7 +14,7 @@ const DashboardBtn = () => {
 
 	return (
 		<Link href="/dashboard">
-			<Button className="gap-2 font-medium bg-emerald-600 dark:bg-emerald-800 dark:border-emerald-400 text-emerald-50 hover:bg-emerald-700 hover:text-emerald-50">
+			<Button>
 				<LayoutDashboard size={16} />
 				Dashboard
 			</Button>

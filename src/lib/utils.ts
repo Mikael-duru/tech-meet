@@ -1,6 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Doc } from "../../convex/_generated/dataModel";
 import {
 	addHours,
 	intervalToDuration,
@@ -9,12 +8,11 @@ import {
 	isWithinInterval,
 } from "date-fns";
 
+import { Interview, User } from "./types";
+
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
-
-type Interview = Doc<"interviews">;
-type User = Doc<"users">;
 
 export const groupInterviews = (interviews: Interview[]) => {
 	if (!interviews) return {};
@@ -99,5 +97,5 @@ export const getMeetingStatus = (interview: Interview) => {
 	if (isWithinInterval(now, { start: interviewStartTime, end: endTime }))
 		return "live";
 	if (isBefore(now, interviewStartTime)) return "upcoming";
-	return "completed";
+	return "missed";
 };
