@@ -11,10 +11,10 @@ import { InterviewFormType } from "@/lib/types";
 
 const ScheduleUI = () => {
 	const [open, setOpen] = useState(false);
-
-	const interviews = useQuery(api.interviews.getAllInterviews) ?? [];
 	const [initialFormData, setInitialFormData] =
 		useState<InterviewFormType | null>(null);
+
+	const interviews = useQuery(api.interviews.getAllInterviews) ?? [];
 
 	const sortedInterview = interviews.sort((a, b) => {
 		return b.startTime - a.startTime;

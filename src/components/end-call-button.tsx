@@ -26,7 +26,7 @@ const EndCallButton = () => {
 
 	if (!isMeetingHost) return null;
 
-	const handleInterviewUpdate = async () => {
+	const handleEndScheduledCall = async () => {
 		try {
 			await call.endCall();
 
@@ -46,7 +46,7 @@ const EndCallButton = () => {
 		}
 	};
 
-	const handleEndCall = async () => {
+	const handleEndInstantCall = async () => {
 		try {
 			await call.endCall();
 
@@ -62,11 +62,11 @@ const EndCallButton = () => {
 	};
 
 	return !interviews ? (
-		<Button variant={"destructive"} onClick={handleEndCall}>
+		<Button variant={"destructive"} onClick={handleEndInstantCall}>
 			End Meeting
 		</Button>
 	) : (
-		<Button variant={"destructive"} onClick={handleInterviewUpdate}>
+		<Button variant={"destructive"} onClick={handleEndScheduledCall}>
 			End Meeting
 		</Button>
 	);
