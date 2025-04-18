@@ -152,7 +152,7 @@ const ScheduleDialog = ({
 					interviewerIds,
 				});
 
-				toast.success("Interview scheduled successfully!", {
+				toast.success("Interview created successfully! 🎉", {
 					id: "schedule-meeting",
 				});
 			} catch (error) {
@@ -177,7 +177,7 @@ const ScheduleDialog = ({
 					interviewerIds,
 				});
 
-				toast.success("Interview updated successfully!", {
+				toast.success("Interview updated successfully! 🎉", {
 					id: "update-meeting",
 				});
 
