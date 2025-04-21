@@ -10,8 +10,8 @@ import {
 import {
 	LayoutListIcon,
 	LoaderCircleIcon,
-	LoaderIcon,
 	UsersIcon,
+	VideoIcon,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -32,6 +32,7 @@ import EndCallButton from "./end-call-button";
 import CodeEditor from "./code-editor";
 import CopyLinkBtn from "./copy-link-btn";
 import { Card, CardContent } from "./ui/card";
+import { PulseLoader } from "react-spinners";
 
 const MeetingRoom = () => {
 	const { id } = useParams();
@@ -109,7 +110,8 @@ const MeetingRoom = () => {
 	if (callingState !== CallingState.JOINED) {
 		return (
 			<div className="h-[calc(100vh-4rem-1px)] flex items-center justify-center">
-				<LoaderIcon className="size-10 animate-spin" />
+				<VideoIcon className="size-20" />
+				<PulseLoader color="gray" />
 			</div>
 		);
 	}
