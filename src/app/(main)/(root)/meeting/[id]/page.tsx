@@ -4,7 +4,6 @@ import { useUser } from "@clerk/nextjs";
 import { StreamCall, StreamTheme } from "@stream-io/video-react-sdk";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { VideoOffIcon } from "lucide-react";
 
 import LoaderUI from "@/components/loader-ui";
@@ -20,68 +19,31 @@ const MeetingPage = () => {
 	const { isLoaded } = useUser();
 	const { call, isCallLoading } = useGetCallById(id);
 	const [isSetupComplete, setIsSetupComplete] = useState(false);
-	const [isRejoining, setIsRejoining] = useState(false);
 
-	// Rejoin call on reload/refresh in a tab
+	// If already on-call, Switch to meeting room on refresh
 	useEffect(() => {
-		if (!call || !id) return;
+		const { sessionStreamCallId } = JSON.parse(
+			sessionStorage.getItem("__meet_callInSession") || "{}"
+		);
 
-		const session = sessionStorage.getItem("__callInSession");
-		if (!session) return;
+		if (sessionStreamCallId && sessionStreamCallId === id)
+			setIsSetupComplete(true);
+	}, [id]);
 
-		try {
-			const { callSession, setupCompleted } = JSON.parse(session);
-			if (callSession !== id || !setupCompleted) return;
-
-			const rejoinCall = async () => {
-				toast.loading("Rejoining call...", { id: "rejoining" });
-				setIsRejoining(true);
-
-				try {
-					call.camera.disable();
-					await call.join();
-					setIsSetupComplete(true);
-					toast.dismiss("rejoining");
-				} catch (err) {
-					console.error("Call rejoin failed:", err);
-					toast.error("Failed to rejoin call", { id: "rejoining" });
-					setIsSetupComplete(false);
-				} finally {
-					setIsRejoining(false);
-				}
-			};
-
-			rejoinCall();
-		} catch (err) {
-			console.warn("Invalid session data:", err);
-			sessionStorage.removeItem("__callInSession");
-			if (localStorage.getItem("__techMeetCallSession") === id) {
-				localStorage.removeItem("__techMeetCallSession");
-			}
-		}
-	}, [call, id]);
-
-	// Store in sessionStorage when setup is complete
 	useEffect(() => {
-		if (isSetupComplete && id) {
-			sessionStorage.setItem(
-				"__callInSession",
-				JSON.stringify({
-					callSession: id,
-					setupCompleted: true,
-				})
-			);
-			localStorage.setItem("__techMeetCallSession", id as string);
-		}
-	}, [isSetupComplete, id]);
+		return () => {
+			sessionStorage.removeItem("__meet_callInSession");
+			localStorage.removeItem("__meet_tabSession");
+		};
+	}, [router]);
 
 	// Add window beforeunload event to clean up localStorage properly.
 	useEffect(() => {
 		const handleTabClose = () => {
 			// Only clear if this tab is the only one holding the session
-			const callSessionId = localStorage.getItem("__techMeetCallSession");
+			const callSessionId = localStorage.getItem("__meet_tabSession");
 			if (callSessionId === id) {
-				localStorage.removeItem("__techMeetCallSession");
+				localStorage.removeItem("__meet_tabSession");
 			}
 		};
 
@@ -111,12 +73,7 @@ const MeetingPage = () => {
 				<p className="text-muted-foreground mb-6">
 					The host has ended this call for everyone.
 				</p>
-				<Button
-					className="gap-2 font-medium bg-emerald-600 dark:bg-emerald-800 dark:border-emerald-400 text-emerald-50 hover:bg-emerald-700 hover:text-emerald-50"
-					onClick={() => router.push("/")}
-				>
-					Return to Home
-				</Button>
+				<Button onClick={() => router.push("/")}>Return to Home</Button>
 			</div>
 		);
 	}
@@ -128,7 +85,6 @@ const MeetingPage = () => {
 					<MeetingSetup
 						onSetupComplete={() => setIsSetupComplete(true)}
 						id={id}
-						isRejoining={isRejoining}
 					/>
 				) : (
 					<MeetingRoom />

@@ -17,7 +17,9 @@ const ScheduleUI = () => {
 	const interviews = useQuery(api.interviews.getAllInterviews) ?? [];
 
 	const sortedInterview = interviews.sort((a, b) => {
-		return b.startTime - a.startTime;
+		const dateA = new Date(a.startTime).getTime();
+		const dateB = new Date(b.startTime).getTime();
+		return dateA - dateB;
 	});
 
 	return (

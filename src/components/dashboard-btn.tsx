@@ -14,19 +14,13 @@ const DashboardBtn = () => {
 
 	return (
 		<Link href="/dashboard">
-			<Button>
+			<Button className="max-sm:hidden font-medium">
 				<LayoutDashboard size={16} />
-				Dashboard
+				<span className="max-sm:hidden">Dashboard</span>
 			</Button>
-			{/* <Button
-				className="hidden md:inline-flex items-center gap-2 font-medium"
-			>
-				<LayoutDashboard className="h-4 w-4" />
-				Dashboard
+			<Button className="sm:hidden" size="icon">
+				<LayoutDashboard size={16} />
 			</Button>
-			<Button className="md:hidden w-10 h-10 p-0" size="icon">
-				<LayoutDashboard className="h-4 w-4" />
-			</Button> */}
 		</Link>
 	);
 };

@@ -4,11 +4,17 @@ import {
 	CallParticipantsList,
 	PaginatedGridLayout,
 	SpeakerLayout,
+	useCall,
 	useCallStateHooks,
 } from "@stream-io/video-react-sdk";
-import { LayoutListIcon, LoaderIcon, UsersIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import {
+	LayoutListIcon,
+	LoaderCircleIcon,
+	LoaderIcon,
+	UsersIcon,
+} from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 import {
 	ResizableHandle,
@@ -28,10 +34,55 @@ import CopyLinkBtn from "./copy-link-btn";
 import { Card, CardContent } from "./ui/card";
 
 const MeetingRoom = () => {
+	const { id } = useParams();
 	const router = useRouter();
 	const [layout, setLayout] = useState<"grid" | "speaker">("speaker");
 	const [showParticipants, setShowParticipants] = useState(false);
 	const { useCallCallingState } = useCallStateHooks();
+
+	const call = useCall();
+
+	useEffect(() => {
+		if (!call || !id) return; // Don't do anything until everything is ready
+
+		const { sessionStreamCallId } = JSON.parse(
+			sessionStorage.getItem("__meet_callInSession") || "{}"
+		);
+
+		// Case 1: No session — safe to store a new one
+		if (!sessionStreamCallId) {
+			sessionStorage.setItem(
+				"__meet_callInSession",
+				JSON.stringify({
+					sessionStreamCallId: id,
+				})
+			);
+			localStorage.setItem("__meet_tabSession", id as string);
+			return; // Don't continue
+		}
+
+		// Case 2: Session mismatch — do nothing
+		if (sessionStreamCallId !== id) return;
+
+		// Case 3: Session matches — try to reconnect
+		const reconnectCall = async () => {
+			const storedSettings = JSON.parse(
+				sessionStorage.getItem("__meet_settingsSession") || "{}"
+			);
+
+			const { sessionIsMicDisabled, sessionIsCameraDisabled } = storedSettings;
+
+			try {
+				if (sessionIsMicDisabled) call.microphone.disable();
+				if (sessionIsCameraDisabled) call.camera.disable();
+				if (callingState === CallingState.IDLE) await call.join();
+			} catch (err) {
+				console.warn("Invalid session data:", err);
+			}
+		};
+
+		reconnectCall();
+	}, [call, id]);
 
 	const callingState = useCallCallingState();
 
@@ -45,8 +96,9 @@ const MeetingRoom = () => {
 							You&apos;ve left the call
 						</h2>
 						<p className="text-muted-foreground">Have a nice day ☀️</p>
-						<p className="text-muted-foreground text-xs">
-							Redirecting back to home...
+						<p className="text-muted-foreground text-xs flex items-center justify-center gap-1">
+							Redirecting to home...{" "}
+							<LoaderCircleIcon className="animate-spin size-4" />
 						</p>
 					</CardContent>
 				</Card>
@@ -95,8 +147,9 @@ const MeetingRoom = () => {
 							<div className="min-w-[300px]">
 								<CallControls
 									onLeave={() => {
-										sessionStorage.removeItem("__callInSession");
-										localStorage.removeItem("__techMeetCallSession");
+										sessionStorage.removeItem("__meet_callInSession");
+										sessionStorage.removeItem("__meet_settingsSession");
+										localStorage.removeItem("__meet_tabSession");
 										router.push("/");
 									}}
 								/>

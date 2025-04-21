@@ -77,6 +77,7 @@ const MeetingModal = ({
 					{isJoinMeeting && (
 						<Input
 							placeholder="Paste meeting link or ID here..."
+							className="placeholder:text-sm"
 							value={meetingUrl}
 							onChange={(e) => setMeetingUrl(e.target.value)}
 						/>
@@ -107,7 +108,7 @@ const MeetingModal = ({
 							}}
 							disabled={isJoinMeeting && !meetingUrl.trim()}
 						>
-							{isJoinMeeting ? "Join Meeting" : "Start Meeting"}
+							{isJoinMeeting ? "Confirm" : "Start Meeting"}
 						</Button>
 					</div>
 				</div>

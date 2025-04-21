@@ -304,7 +304,7 @@ const ScheduleDialog = ({
 											key={candidate.clerkId}
 											value={candidate.clerkId}
 										>
-											<UserInfo user={candidate} />
+											<UserInfo userId={candidate.clerkId} />
 										</SelectItem>
 									))}
 								</SelectContent>
@@ -323,7 +323,7 @@ const ScheduleDialog = ({
 										key={interviewer.clerkId}
 										className="inline-flex items-center gap-2 bg-secondary px-2 py-1 rounded-md text-sm"
 									>
-										<UserInfo user={interviewer} />
+										<UserInfo userId={interviewer.clerkId} />
 										{interviewer.clerkId !== user?.id && (
 											<Button
 												onClick={() => removeInterviewer(interviewer.clerkId)}
@@ -348,7 +348,7 @@ const ScheduleDialog = ({
 												key={interviewer.clerkId}
 												value={interviewer.clerkId}
 											>
-												<UserInfo user={interviewer} />
+												<UserInfo userId={interviewer.clerkId} />
 											</SelectItem>
 										))}
 									</SelectContent>

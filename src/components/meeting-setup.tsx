@@ -6,31 +6,40 @@ import {
 import React, { useEffect, useState } from "react";
 import { CameraIcon, MicIcon, SettingsIcon } from "lucide-react";
 import { toast } from "sonner";
-
-import { Card } from "./ui/card";
-import { Switch } from "./ui/switch";
-import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+
+import { Card } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 
 type MeetingSetupProps = {
 	onSetupComplete: () => void;
 	id: string | string[];
-	isRejoining: boolean;
 };
 
-const MeetingSetup = ({
-	onSetupComplete,
-	id,
-	isRejoining,
-}: MeetingSetupProps) => {
+const MeetingSetup = ({ onSetupComplete, id }: MeetingSetupProps) => {
 	const [isCameraDisabled, setIsCameraDisabled] = useState(true);
 	const [isMicDisabled, setIsMicDisabled] = useState(false);
 	const [activeCallTab, setActiveCallTab] = useState("");
 	const [isJoining, setIsJoining] = useState(false);
+	const [isRejoining, setIsRejoining] = useState(false);
 
 	const router = useRouter();
-
 	const call = useCall(); // useCall() provides the call prop passed to StreamCall
+
+	useEffect(() => {
+		const storedSettings = JSON.parse(
+			sessionStorage.getItem("__meet_settingsSession") || "{}"
+		);
+		if (
+			!storedSettings ||
+			storedSettings.id !== id ||
+			!storedSettings.setupCompleted
+		)
+			return;
+
+		setIsRejoining(true);
+	}, [id]);
 
 	useEffect(() => {
 		if (isCameraDisabled) call?.camera.disable();
@@ -43,7 +52,7 @@ const MeetingSetup = ({
 	}, [isMicDisabled, call?.microphone]);
 
 	useEffect(() => {
-		const activeCallTab = localStorage.getItem("__techMeetCallSession");
+		const activeCallTab = localStorage.getItem("__meet_tabSession");
 		if (!activeCallTab) return;
 
 		setActiveCallTab(activeCallTab);
@@ -51,8 +60,9 @@ const MeetingSetup = ({
 
 	const handleJoinMeeting = async () => {
 		setIsJoining(true);
+
+		// If user is already in any meeting (same or different)
 		if (activeCallTab) {
-			// If user is already in any meeting (same or different)
 			if (activeCallTab === id) {
 				toast.error(
 					"You're already in this meeting in another tab. Please switch to that tab.",
@@ -62,7 +72,7 @@ const MeetingSetup = ({
 				);
 			} else {
 				toast.error(
-					"You're currently in a different meeting. Please end that call first.",
+					"You're currently in another meeting. Please end that call first.",
 					{
 						id: "joining-meeting",
 					}
@@ -70,10 +80,23 @@ const MeetingSetup = ({
 			}
 			return;
 		}
+
 		await call?.join();
 		toast.success("Joined meeting successfully! 🎉", {
 			id: "joining-meeting",
 		});
+
+		// For general use
+		sessionStorage.setItem(
+			"__meet_settingsSession",
+			JSON.stringify({
+				id,
+				setupCompleted: true,
+				sessionIsMicDisabled: isMicDisabled,
+				sessionIsCameraDisabled: isCameraDisabled,
+			})
+		);
+
 		onSetupComplete();
 	};
 
@@ -126,7 +149,7 @@ const MeetingSetup = ({
 										</div>
 										<Switch
 											checked={!isCameraDisabled}
-											disabled={isRejoining || isJoining}
+											disabled={isJoining}
 											onCheckedChange={(checked) =>
 												setIsCameraDisabled(!checked)
 											}
@@ -148,7 +171,7 @@ const MeetingSetup = ({
 										</div>
 										<Switch
 											checked={!isMicDisabled}
-											disabled={isRejoining || isJoining}
+											disabled={isJoining}
 											onCheckedChange={(checked) => setIsMicDisabled(!checked)}
 										/>
 									</div>
@@ -172,6 +195,12 @@ const MeetingSetup = ({
 
 								{/* Join button */}
 								<div className="space-y-3 mt-8">
+									{isRejoining && (
+										<p className="text-sm text-red-500 text-center">
+											Looks like your session ended. Try rejoining the meeting.
+										</p>
+									)}
+
 									<Button
 										className="w-full"
 										size="lg"
@@ -182,13 +211,13 @@ const MeetingSetup = ({
 
 											handleJoinMeeting();
 										}}
-										disabled={isRejoining || isJoining}
+										disabled={isJoining}
 									>
-										Proceed to Meeting
+										{isRejoining ? "Rejoin Meeting" : "Join Meeting"}
 									</Button>
 									<p className="text-xs text-center text-muted-foreground">
 										Do not worry, our team is super friendly! We want you to
-										succeed. 🎉
+										succeed 🎉
 									</p>
 								</div>
 							</div>

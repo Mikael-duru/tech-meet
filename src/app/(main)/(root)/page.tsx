@@ -10,6 +10,9 @@ import { UseUserRole } from "@/hooks/use-user-role";
 import { api } from "../../../../convex/_generated/api";
 import MeetingModal from "@/components/meeting-modal";
 import LoaderUI from "@/components/loader-ui";
+import MeetingCard from "@/components/meeting-card";
+import { BarLoader } from "react-spinners";
+import ReturnToCallBtn from "@/components/return-to-call-btn";
 
 export default function Home() {
 	const router = useRouter();
@@ -34,6 +37,12 @@ export default function Home() {
 		}
 	};
 
+	const sortedInterviews = interviews?.sort((a, b) => {
+		const dateA = new Date(a.startTime).getTime();
+		const dateB = new Date(b.startTime).getTime();
+		return dateA - dateB;
+	});
+
 	if (isLoading) {
 		return <LoaderUI />;
 	}
@@ -41,15 +50,18 @@ export default function Home() {
 	return (
 		<div className="container mx-auto max-w-7xl p-6">
 			{/* Welcome message */}
-			<section className="rounded-lg bg-card p-6 border shadow-sm mb-10">
-				<h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
-					Welcome back!
-				</h1>
-				<p className="text-muted-foreground mt-2">
-					{isInterviewer
-						? "Manage your interviews and review candidates effectively"
-						: "Access your upcoming interviews and preparations"}
-				</p>
+			<section className="rounded-lg bg-card p-6 border shadow-sm mb-10 flex items-center justify-between flex-wrap gap-10">
+				<div>
+					<h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
+						Welcome back!
+					</h1>
+					<p className="text-muted-foreground mt-2">
+						{isInterviewer
+							? "Manage your interviews and review candidates effectively"
+							: "Access your upcoming interviews and preparations"}
+					</p>
+				</div>
+				<ReturnToCallBtn />
 			</section>
 
 			{isInterviewer ? (
@@ -72,7 +84,30 @@ export default function Home() {
 					/>
 				</>
 			) : (
-				<></>
+				<>
+					<div>
+						<h1 className="text-3xl font-bold">Your Interviews</h1>
+						<p className="text-muted-foreground mt-1">
+							View and join your scheduled interviews
+						</p>
+					</div>
+
+					<div className="mt-8">
+						{sortedInterviews === undefined ? (
+							<BarLoader className="mt-4" width={"100%"} color="gray" />
+						) : sortedInterviews.length > 0 ? (
+							<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+								{sortedInterviews.map((interview) => (
+									<MeetingCard key={interview._id} interview={interview} />
+								))}
+							</div>
+						) : (
+							<div className="text-center py-12 text-muted-foreground">
+								You have no scheduled interviews at the moment
+							</div>
+						)}
+					</div>
+				</>
 			)}
 		</div>
 	);

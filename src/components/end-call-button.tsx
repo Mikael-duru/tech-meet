@@ -1,10 +1,11 @@
 import { useCall, useCallStateHooks } from "@stream-io/video-react-sdk";
 import { useMutation, useQuery } from "convex/react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+
 import { api } from "../../convex/_generated/api";
 import { Button } from "./ui/button";
 import { Id } from "../../convex/_generated/dataModel";
-import { toast } from "sonner";
 
 const EndCallButton = () => {
 	const call = useCall();
@@ -35,8 +36,9 @@ const EndCallButton = () => {
 				status: "completed",
 			});
 
-			sessionStorage.removeItem("__callInSession");
-			localStorage.removeItem("__techMeetCallSession");
+			sessionStorage.removeItem("__meet_callInSession");
+			sessionStorage.removeItem("__meet_settingsSession");
+			localStorage.removeItem("__meet_tabSession");
 
 			router.push("/");
 			toast.success("Meeting ended for everyone!");
@@ -50,8 +52,9 @@ const EndCallButton = () => {
 		try {
 			await call.endCall();
 
-			sessionStorage.removeItem("__callInSession");
-			localStorage.removeItem("__techMeetCallSession");
+			sessionStorage.removeItem("__meet_callInSession");
+			sessionStorage.removeItem("__meet_settingsSession");
+			localStorage.removeItem("__meet_tabSession");
 
 			router.push("/");
 			toast.success("Meeting ended for everyone!");

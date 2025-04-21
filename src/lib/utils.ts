@@ -3,7 +3,6 @@ import { twMerge } from "tailwind-merge";
 import {
 	addHours,
 	intervalToDuration,
-	isAfter,
 	isBefore,
 	isWithinInterval,
 } from "date-fns";
@@ -18,34 +17,14 @@ export const groupInterviews = (interviews: Interview[]) => {
 	if (!interviews) return {};
 
 	return interviews.reduce((acc: any, interview: Interview) => {
-		const date = new Date(interview.startTime);
-		const now = new Date();
-
-		if (interview.status === "succeeded") {
-			acc.succeeded = [...(acc.succeeded || []), interview];
-		} else if (interview.status === "failed") {
-			acc.failed = [...(acc.failed || []), interview];
-		} else if (isBefore(date, now)) {
+		if (interview.status === "completed") {
 			acc.completed = [...(acc.completed || []), interview];
-		} else if (isAfter(date, now)) {
-			acc.upcoming = [...(acc.upcoming || []), interview];
+		} else if (interview.status === "passed" || interview.status === "failed") {
+			acc.outcome = [...(acc.outcome || []), interview];
 		}
 
 		return acc;
 	}, {});
-};
-
-export const getCandidateInfo = (users: User[], candidateId: string) => {
-	const candidate = users?.find((user) => user.clerkId === candidateId);
-	return {
-		name: candidate?.name || "Unknown Candidate",
-		image: candidate?.image || "",
-		initials:
-			candidate?.name
-				?.split(" ")
-				.map((n) => n[0])
-				.join("") || "UC",
-	};
 };
 
 export const getInterviewerInfo = (users: User[], interviewerId: string) => {

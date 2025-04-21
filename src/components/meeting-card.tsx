@@ -1,9 +1,9 @@
 import useMeetingActions from "@/hooks/use-meeting-actions";
 import { Interview, InterviewFormType } from "@/lib/types";
 import { getMeetingStatus } from "@/lib/utils";
-
-import { format } from "date-fns";
-import React from "react";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import { api } from "../../convex/_generated/api";
 import {
 	Card,
 	CardContent,
@@ -11,18 +11,18 @@ import {
 	CardHeader,
 	CardTitle,
 } from "./ui/card";
+
+import { format } from "date-fns";
+import React from "react";
 import { CalendarIcon, EditIcon, TrashIcon } from "lucide-react";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
 import { useMutation, useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
 
 type Props = {
 	interview: Interview;
-	setInitialFormData: React.Dispatch<
+	setInitialFormData?: React.Dispatch<
 		React.SetStateAction<InterviewFormType | null>
 	>;
-	setOpen: (open: boolean) => void;
+	setOpen?: (open: boolean) => void;
 };
 
 const MeetingCard = ({ interview, setInitialFormData, setOpen }: Props) => {
@@ -38,7 +38,7 @@ const MeetingCard = ({ interview, setInitialFormData, setOpen }: Props) => {
 	const deleteInterview = useMutation(api.interviews.deleteInterview);
 
 	const getInitialFormData = () => {
-		if (!initialInterviewData) return;
+		if (!initialInterviewData || !setInitialFormData || !setOpen) return;
 
 		const { _id, title, description, startTime, candidateId, interviewerIds } =
 			initialInterviewData;
@@ -85,7 +85,7 @@ const MeetingCard = ({ interview, setInitialFormData, setOpen }: Props) => {
 	);
 
 	return (
-		<Card>
+		<Card className="hover:bg-secondary/80 hover:border-primary/80 transition-colors duration-300 ease-in-out">
 			<CardHeader className="space-y-2">
 				<CardTitle className="capitalize flex items-center justify-between gap-4">
 					{interview.title}
