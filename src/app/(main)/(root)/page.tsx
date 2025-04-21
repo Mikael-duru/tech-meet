@@ -40,7 +40,7 @@ export default function Home() {
 	const sortedInterviews = interviews?.sort((a, b) => {
 		const dateA = new Date(a.startTime).getTime();
 		const dateB = new Date(b.startTime).getTime();
-		return dateA - dateB;
+		return dateB - dateA;
 	});
 
 	if (isLoading) {

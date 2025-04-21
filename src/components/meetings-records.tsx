@@ -38,24 +38,30 @@ const Recordings = () => {
 		fetchRecordings();
 	}, [calls]);
 
+	const sortedRecordings = recordings?.sort((a, b) => {
+		const dateA = new Date(a.start_time).getTime();
+		const dateB = new Date(b.start_time).getTime();
+		return dateA - dateB;
+	});
+
 	if (isLoading || recordingsLoading) return <LoaderUI />;
 
 	return (
 		<div className="container max-w-7xl mx-auto py-6">
 			{/* Header */}
 			<h1 className="text-3xl font-bold">Recordings</h1>
-			{recordings.length > 0 && (
+			{sortedRecordings.length > 0 && (
 				<p className="text-muted-foreground my-1">
-					{recordings.length}{" "}
-					{recordings.length === 1 ? "recording" : "recordings"} available
+					{sortedRecordings.length}{" "}
+					{sortedRecordings.length === 1 ? "recording" : "recordings"} available
 				</p>
 			)}
 
 			{/* Recording grid */}
 			<ScrollArea className="h-[calc(100vh-12rem)] mt-3">
-				{recordings.length > 0 ? (
+				{sortedRecordings.length > 0 ? (
 					<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-6">
-						{recordings.map((r) => (
+						{sortedRecordings.map((r) => (
 							<RecordingCard key={r.end_time} recording={r} />
 						))}
 					</div>

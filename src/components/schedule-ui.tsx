@@ -19,7 +19,7 @@ const ScheduleUI = () => {
 	const sortedInterview = interviews.sort((a, b) => {
 		const dateA = new Date(a.startTime).getTime();
 		const dateB = new Date(b.startTime).getTime();
-		return dateA - dateB;
+		return dateB - dateA;
 	});
 
 	return (
