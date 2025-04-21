@@ -87,7 +87,9 @@ const MeetingCard = ({ interview, setInitialFormData, setOpen }: Props) => {
 	);
 
 	return (
-		<Card className="hover:bg-secondary/80 hover:border-primary/80 transition-colors duration-300 ease-in-out">
+		<Card
+			className={`${status === "missed" ? "border-red-500/40" : status === "completed" ? "border-green-500/40" : ""}`}
+		>
 			<CardHeader className="space-y-2">
 				<CardTitle className="capitalize flex items-center justify-between gap-4">
 					{interview.title}
