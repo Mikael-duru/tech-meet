@@ -19,7 +19,10 @@ const ReturnToCallBtn = () => {
 		<Button
 			className="animate-bounce"
 			size={"lg"}
-			onClick={() => joinMeeting(storedSettings.id)}
+			onClick={() => {
+				joinMeeting(storedSettings.id);
+				window.location.href = `/meeting/${storedSettings.id}`;
+			}}
 		>
 			<PhoneCall className="mr-1" /> Return to Call
 		</Button>
