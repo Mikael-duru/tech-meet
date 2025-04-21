@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import React from "react";
 import { CalendarIcon, EditIcon, TrashIcon } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
+import { UseUserRole } from "@/hooks/use-user-role";
 
 type Props = {
 	interview: Interview;
@@ -27,6 +28,7 @@ type Props = {
 
 const MeetingCard = ({ interview, setInitialFormData, setOpen }: Props) => {
 	const { joinMeeting } = useMeetingActions();
+	const { isInterviewer } = UseUserRole();
 
 	const initialInterviewData = useQuery(
 		api.interviews.getInterviewByStreamCallId,
@@ -89,7 +91,7 @@ const MeetingCard = ({ interview, setInitialFormData, setOpen }: Props) => {
 			<CardHeader className="space-y-2">
 				<CardTitle className="capitalize flex items-center justify-between gap-4">
 					{interview.title}
-					{status === "upcoming" && (
+					{isInterviewer && status === "upcoming" && (
 						<Button
 							variant={"destructive"}
 							size={"sm"}
@@ -141,9 +143,11 @@ const MeetingCard = ({ interview, setInitialFormData, setOpen }: Props) => {
 						<Button variant="outline" className="w-full" disabled>
 							Waiting to Start
 						</Button>
-						<Button size="sm" onClick={getInitialFormData}>
-							<EditIcon />
-						</Button>
+						{isInterviewer && (
+							<Button size="sm" onClick={getInitialFormData}>
+								<EditIcon />
+							</Button>
+						)}
 					</div>
 				)}
 			</CardContent>
