@@ -17,9 +17,9 @@ const CopyLinkBtn = ({ url, type }: { url: string; type: string }) => {
 
 	return (
 		<Button variant="secondary" onClick={handleCopyLink}>
-			<span className="max-sm:sr-only">
-				{type === "Meeting" && "Meeting link"}
-			</span>
+			{type === "Meeting" && (
+				<span className="max-sm:hidden">Meeting link</span>
+			)}
 			<CopyIcon className="size-4" />
 		</Button>
 	);
