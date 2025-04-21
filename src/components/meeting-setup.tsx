@@ -196,7 +196,7 @@ const MeetingSetup = ({ onSetupComplete, id }: MeetingSetupProps) => {
 								{/* Join button */}
 								<div className="space-y-3 mt-8">
 									{isRejoining && (
-										<p className="text-sm text-red-500 text-center">
+										<p className="text-xs text-red-500 text-center">
 											Looks like your session ended. Try rejoining the meeting.
 										</p>
 									)}
