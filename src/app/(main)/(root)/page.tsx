@@ -13,13 +13,15 @@ import LoaderUI from "@/components/loader-ui";
 import MeetingCard from "@/components/meeting-card";
 import { BarLoader } from "react-spinners";
 import ReturnToCallBtn from "@/components/return-to-call-btn";
+import SwitchRole from "@/components/role-switch";
+import { Id } from "../../../../convex/_generated/dataModel";
 
 export default function Home() {
 	const router = useRouter();
 	const [showModal, setShowModal] = useState(false);
 	const [modalType, setModalType] = useState<"start" | "join">();
 
-	const { isInterviewer, isLoading } = UseUserRole();
+	const { isInterviewer, isLoading, userConvexId } = UseUserRole();
 	const interviews = useQuery(api.interviews.getMyInterviews);
 
 	const handleQuickAction = (title: string) => {
@@ -55,11 +57,15 @@ export default function Home() {
 					<h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
 						Welcome back!
 					</h1>
-					<p className="text-muted-foreground mt-2">
+					<p className="text-muted-foreground mt-2 mb-4">
 						{isInterviewer
 							? "Manage your interviews and review candidates effectively"
 							: "Access your upcoming interviews and preparations"}
 					</p>
+					<SwitchRole
+						userConvexId={userConvexId as Id<"users">}
+						isInterviewer={isInterviewer}
+					/>
 				</div>
 				<ReturnToCallBtn />
 			</section>

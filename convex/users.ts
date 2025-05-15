@@ -23,18 +23,18 @@ export const syncUser = mutation({
 	},
 });
 
-// // Update user role
-// export const updateUserRole = mutation({
-// 	args: {
-// 		id: v.id("users"),
-// 		role: v.union(v.literal("candidate"), v.literal("interviewer"),),
-// 	},
-// 	handler: async (ctx, args) => {
-// 		return await ctx.db.patch(args.id, {
-// 			role: args.role,
-// 		});
-// 	},
-// });
+// Update user role
+export const updateUserRole = mutation({
+	args: {
+		id: v.id("users"),
+		role: v.union(v.literal("candidate"), v.literal("interviewer")),
+	},
+	handler: async (ctx, args) => {
+		return await ctx.db.patch(args.id, {
+			role: args.role,
+		});
+	},
+});
 
 export const getUsers = query({
 	handler: async (ctx) => {

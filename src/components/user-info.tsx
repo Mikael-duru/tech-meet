@@ -1,5 +1,4 @@
 import React from "react";
-import { UserCircleIcon } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { User } from "@/lib/types";
